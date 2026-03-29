@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+
+    <persistence-unit name="quanlygaraPU">
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.KhachHang</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.NhanVien</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.Xe</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.HieuXe</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.PhieuSuaChua</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.DichVu</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.PhuTung</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.NhaCungCap</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.HoaDon</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.HopDongCungCap</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.ChiTietDichVu</class>
+        <class>com.tutorialspoint.jdbc.com.quanlygara.entity.ChiTietNhap</class>
+
+        <properties>
+            <!-- JDBC -->
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:mysql://localhost:3306/quanlygara?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value="thvvmd1012@"/>
+
+            <!-- Schema generation -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
+
+            <!-- Hibernate logging -->
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.highlight_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>
