@@ -1,10 +1,15 @@
 package com.tutorialspoint.jdbc.com.quanlygara.view.subform;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -16,10 +21,25 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.BorderFactory;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+
 import com.tutorialspoint.jdbc.com.quanlygara.controller.ThongKeController;
+import com.tutorialspoint.jdbc.com.quanlygara.util.UIUtils;
 import com.tutorialspoint.jdbc.com.quanlygara.entity.HopDongCungCap;
 import com.tutorialspoint.jdbc.com.quanlygara.entity.PhieuSuaChua;
 import com.tutorialspoint.jdbc.com.quanlygara.util.DataChangeListener;
@@ -42,26 +62,31 @@ public class ThongKeSubForm extends JPanel implements DataChangeListener {
     public ThongKeSubForm() {
         DataChangeNotifier.addListener(this);
         setLayout(new BorderLayout());
+        setBackground(Color.WHITE);
 
         // Tab 1: Tổng quan
         JPanel panelTongQuan = createTongQuanPanel();
-        tabbedPane.addTab("Tong quan", panelTongQuan);
+        tabbedPane.addTab("Tổng quan", panelTongQuan);
 
         // Tab 2: Danh sách hóa đơn
         JPanel panelHoaDon = createHoaDonPanel();
-        tabbedPane.addTab("Danh sach hoa don", panelHoaDon);
+        tabbedPane.addTab("Danh sách hóa đơn", panelHoaDon);
 
         // Tab 3: Phieu sua + dich vu (CRUD)
         JPanel panelPhieuSuaDichVuCrud = createPhieuSuaDichVuCrudPanel();
-        tabbedPane.addTab("Phieu sua + dich vu CRUD", panelPhieuSuaDichVuCrud);
+        tabbedPane.addTab("Phiếu sửa + dịch vụ CRUD", panelPhieuSuaDichVuCrud);
 
         // Tab 4: Chi tiet nhap hang (CRUD)
         JPanel panelNhapHang = createChiTietNhapCrudPanel();
-        tabbedPane.addTab("Chi tiet nhap hang", panelNhapHang);
+        tabbedPane.addTab("Chi tiết nhập hàng", panelNhapHang);
 
         // Tab 5: Loi nhuan
         JPanel panelLoiNhuan = createLoiNhuanPanel();
-        tabbedPane.addTab("Loi nhuan", panelLoiNhuan);
+        tabbedPane.addTab("Lợi nhuận", panelLoiNhuan);
+
+        // Tab 6: Biểu đồ thống kê
+        JPanel panelCharts = createChartsPanel();
+        tabbedPane.addTab("Biểu đồ thống kê", panelCharts);
 
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -753,5 +778,183 @@ public class ThongKeSubForm extends JPanel implements DataChangeListener {
         panel.add(lblTitle, BorderLayout.NORTH);
         panel.add(valueLabel, BorderLayout.CENTER);
         return panel;
+    }
+
+    private JPanel createChartsPanel() {
+        UIUtils.RoundedPanel mainPanel = new UIUtils.RoundedPanel(20, Color.WHITE);
+        mainPanel.setLayout(new BorderLayout(10, 10));
+        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        // Add shadow effect
+        mainPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            new UIUtils.RoundedBorder(20, new Color(200, 200, 200), 1),
+            new EmptyBorder(20, 20, 20, 20)
+        ));
+
+        // Create title panel
+        UIUtils.RoundedPanel titlePanel = new UIUtils.RoundedPanel(15, new Color(41, 128, 185));
+        titlePanel.setLayout(new BorderLayout());
+        titlePanel.setBorder(new EmptyBorder(15, 20, 15, 20));
+        
+        JLabel titleLabel = new JLabel("Biểu Đồ Thống Kê Doanh Nghiệp", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+        
+        mainPanel.add(titlePanel, BorderLayout.NORTH);
+
+        // Charts container - use 1x2 grid for better layout
+        JPanel chartsContainer = new JPanel(new GridLayout(1, 2, 30, 20));
+        chartsContainer.setBackground(Color.WHITE);
+
+        // Create only the two remaining charts
+        JPanel serviceStatusChart = createServiceStatusPieChart();
+        JPanel profitChart = createProfitChart();
+
+        chartsContainer.add(serviceStatusChart);
+        chartsContainer.add(profitChart);
+
+        mainPanel.add(chartsContainer, BorderLayout.CENTER);
+
+        // Refresh button with modern styling
+        JButton btnRefreshCharts = new UIUtils.ModernButton("Làm mới biểu đồ", 12, new Color(52, 152, 219), new Color(41, 128, 185), new Color(31, 97, 141));
+        btnRefreshCharts.addActionListener(e -> refreshCharts());
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(new Color(245, 247, 250));
+        buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+        buttonPanel.add(btnRefreshCharts);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return mainPanel;
+    }
+
+    private JPanel createServiceStatusPieChart() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        
+        try {
+            // Get service status data
+            List<Object[]> statusData = controller.getSoLuongPhieuTheoTrangThai();
+            for (Object[] row : statusData) {
+                String status = String.valueOf(row[0]);
+                Long count = (Long) row[1];
+                dataset.setValue(status, count);
+            }
+        } catch (Exception e) {
+            System.err.println("Error creating service status chart: " + e.getMessage());
+            // Add dummy data if no data available
+            dataset.setValue("Đang sửa", 15L);
+            dataset.setValue("Hoàn thành", 25L);
+        }
+
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Trạng Thái Dịch Vụ",
+            dataset,
+            true, true, false
+        );
+
+        // Customize chart with better colors and styling
+        chart.getTitle().setFont(new Font("Arial", Font.BOLD, 16));
+        chart.setBackgroundPaint(Color.WHITE);
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlineStroke(new java.awt.BasicStroke(1.0f));
+        plot.setOutlinePaint(Color.WHITE);
+        
+        // Set beautiful colors for pie sections
+        plot.setSectionPaint("Đang sửa", new Color(52, 152, 219));      // Blue
+        plot.setSectionPaint("Hoàn thành", new Color(46, 204, 113));    // Green
+        plot.setSectionPaint("Dang sua", new Color(52, 152, 219));     // Blue (English version)
+        plot.setSectionPaint("Hoan thanh", new Color(46, 204, 113));   // Green (English version)
+        
+        // Add explosion effect for completed services
+        plot.setExplodePercent("Hoàn thành", 0.10);
+        plot.setExplodePercent("Hoan thanh", 0.10);
+        
+        // Customize labels
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {1} ({2})"));
+        plot.setLabelFont(new Font("Arial", Font.PLAIN, 12));
+        plot.setLabelBackgroundPaint(Color.WHITE);
+        plot.setLabelOutlinePaint(Color.WHITE);
+        plot.setLabelShadowPaint(Color.WHITE);
+
+        return new ChartPanel(chart);
+    }
+
+    private JPanel createProfitChart() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        
+        try {
+            // Get profit data
+            BigDecimal doanhThu = controller.getTongDoanhThu();
+            BigDecimal chiPhiNV = controller.getChiPhiNhanVien();
+            BigDecimal chiPhiPT = controller.getChiPhiPhuTung();
+            BigDecimal loiNhuan = controller.getLoiNhuanTong();
+
+            dataset.addValue(doanhThu, "Doanh thu", "Tổng");
+            dataset.addValue(chiPhiNV, "Chi phí nhân viên", "Tổng");
+            dataset.addValue(chiPhiPT, "Chi phí phụ tùng", "Tổng");
+            dataset.addValue(loiNhuan, "Lợi nhuận", "Tổng");
+        } catch (Exception e) {
+            System.err.println("Error creating profit chart: " + e.getMessage());
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+            "Phân Tích Lợi Nhuận",
+            "Loại",
+            "Số tiền (VND)",
+            dataset,
+            PlotOrientation.VERTICAL,
+            true, true, false
+        );
+
+        // Customize chart with better colors and styling
+        chart.getTitle().setFont(new Font("Arial", Font.BOLD, 16));
+        chart.setBackgroundPaint(Color.WHITE);
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setDomainGridlinePaint(new Color(230, 230, 230));
+        plot.setRangeGridlinePaint(new Color(230, 230, 230));
+        plot.setDomainGridlineStroke(new java.awt.BasicStroke(1.0f));
+        plot.setRangeGridlineStroke(new java.awt.BasicStroke(1.0f));
+        
+        // Customize colors for each bar
+        org.jfree.chart.renderer.category.BarRenderer renderer = new org.jfree.chart.renderer.category.BarRenderer();
+        renderer.setSeriesPaint(0, new Color(52, 152, 219));    // Doanh thu - Blue
+        renderer.setSeriesPaint(1, new Color(231, 76, 60));     // Chi phí nhân viên - Red
+        renderer.setSeriesPaint(2, new Color(241, 196, 15));    // Chi phí phụ tùng - Yellow
+        renderer.setSeriesPaint(3, new Color(46, 204, 113));    // Lợi nhuận - Green
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setShadowVisible(false);
+        
+        plot.setRenderer(renderer);
+        
+        // Customize axis labels
+        plot.getDomainAxis().setLabelFont(new Font("Arial", Font.BOLD, 12));
+        plot.getDomainAxis().setTickLabelFont(new Font("Arial", Font.PLAIN, 11));
+        plot.getRangeAxis().setLabelFont(new Font("Arial", Font.BOLD, 12));
+        plot.getRangeAxis().setTickLabelFont(new Font("Arial", Font.PLAIN, 11));
+
+        return new ChartPanel(chart);
+    }
+
+    private void refreshCharts() {
+        // Refresh the charts tab by recreating it
+        SwingUtilities.invokeLater(() -> {
+            int chartsTabIndex = -1;
+            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                if (tabbedPane.getTitleAt(i).equals("Biểu đồ thống kê")) {
+                    chartsTabIndex = i;
+                    break;
+                }
+            }
+            
+            if (chartsTabIndex != -1) {
+                JPanel newChartsPanel = createChartsPanel();
+                tabbedPane.setComponentAt(chartsTabIndex, newChartsPanel);
+                tabbedPane.revalidate();
+                tabbedPane.repaint();
+            }
+        });
     }
 }

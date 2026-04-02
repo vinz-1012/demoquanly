@@ -26,4 +26,8 @@ public class PhieuSuaChuaDAO extends GenericDAO<PhieuSuaChua> {
     public List<PhieuSuaChua> findAll() {
         return executeQuery("SELECT p FROM PhieuSuaChua p LEFT JOIN FETCH p.xe LEFT JOIN FETCH p.xe.khachHang LEFT JOIN FETCH p.nhanVien ORDER BY p.maPhieu");
     }
+    public List<PhieuSuaChua> findByTenKH(String tenKH) {
+        return executeQuery("SELECT p FROM PhieuSuaChua p LEFT JOIN FETCH p.xe LEFT JOIN FETCH p.xe.khachHang LEFT JOIN FETCH p.nhanVien WHERE p.xe.khachHang.tenKH LIKE ?1", "%" + tenKH + "%");
+    }
 }
+

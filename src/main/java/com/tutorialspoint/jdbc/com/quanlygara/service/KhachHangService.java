@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class KhachHangService {
     private KhachHangDAO khachHangDAO = new KhachHangDAO();
-    private XeService xeService = new XeService();
+    public XeService xeService = new XeService();
 
     public void save(KhachHang khachHang) {
         {
@@ -55,6 +55,10 @@ public class KhachHangService {
 
     public KhachHang findByDienThoai(String dienThoai) {
         return khachHangDAO.findByDienThoai(dienThoai);
+    }
+    
+    public List<com.tutorialspoint.jdbc.com.quanlygara.entity.Xe> getXeByMaKH(Integer maKH) {
+        return xeService.findByMaKH(maKH);
     }
     
     public boolean canDelete(KhachHang khachHang) {

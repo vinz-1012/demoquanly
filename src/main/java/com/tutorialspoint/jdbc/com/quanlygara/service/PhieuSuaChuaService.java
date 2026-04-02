@@ -142,6 +142,10 @@ public class PhieuSuaChuaService {
         return phieuSuaChuaDAO.findByMaNV(maNV);
     }
 
+    public List<PhieuSuaChua> findByTenKH(String tenKH) {
+        return phieuSuaChuaDAO.findByTenKH(tenKH);
+    }
+
     // Convert to DTO
     public PhieuSuaChuaDTO toDTO(PhieuSuaChua phieuSuaChua) {
         return new PhieuSuaChuaDTO(

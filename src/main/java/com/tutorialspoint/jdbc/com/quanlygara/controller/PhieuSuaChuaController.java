@@ -74,4 +74,17 @@ public class PhieuSuaChuaController {
         List<PhieuSuaChua> phieuSuaChuas = phieuSuaChuaService.findByMaNV(maNV);
         return phieuSuaChuaService.toDTOList(phieuSuaChuas);
     }
+
+    public List<PhieuSuaChuaDTO> getPhieuSuaChuaByMaPhieu(Integer maPhieu) {
+        PhieuSuaChua phieuSuaChua = phieuSuaChuaService.findById(maPhieu);
+        if (phieuSuaChua != null) {
+            return List.of(phieuSuaChuaService.toDTO(phieuSuaChua));
+        }
+        return List.of();
+    }
+
+    public List<PhieuSuaChuaDTO> getPhieuSuaChuaByTenKH(String tenKH) {
+        List<PhieuSuaChua> phieuSuaChuas = phieuSuaChuaService.findByTenKH(tenKH);
+        return phieuSuaChuaService.toDTOList(phieuSuaChuas);
+    }
 }

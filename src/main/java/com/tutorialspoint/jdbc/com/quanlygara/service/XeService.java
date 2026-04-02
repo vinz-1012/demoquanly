@@ -2,6 +2,7 @@ package com.tutorialspoint.jdbc.com.quanlygara.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.persistence.EntityManager;
 
 import com.tutorialspoint.jdbc.com.quanlygara.dao.PhieuSuaChuaDAO;
 import com.tutorialspoint.jdbc.com.quanlygara.dao.XeDAO;
@@ -29,8 +30,48 @@ public class XeService {
         xeDAO.update(xe);
     }
 
+    public boolean canDelete(Xe xe) {
+        // Check if there are any PhieuSuaChua for this Xe
+        List<PhieuSuaChua> phieuSuaChuas = phieuSuaChuaDAO.findByMaXe(xe.getMaXe());
+        System.out.println("Checking canDelete for xe maXe: " + xe.getMaXe() + ", found " + phieuSuaChuas.size() + " related PhieuSuaChua");
+        return phieuSuaChuas.isEmpty();
+    }
+
     public void delete(Xe xe) {
+        System.out.println("Deleting xe: " + xe.getMaXe() + " - " + xe.getBienSo());
         xeDAO.delete(xe);
+        System.out.println("Xe deleted successfully");
+    }
+
+    // Alternative delete method that directly uses EntityManager
+    public void deleteById(Integer maXe) {
+        System.out.println("Deleting xe by ID: " + maXe);
+        EntityManager em = xeDAO.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            
+            Xe xe = em.find(Xe.class, maXe);
+            if (xe != null) {
+                em.remove(xe);
+                System.out.println("Xe entity removed: " + xe.getMaXe());
+            } else {
+                System.out.println("Xe not found with ID: " + maXe);
+            }
+            
+            em.getTransaction().commit();
+            System.out.println("Delete transaction committed");
+        } catch (Exception e) {
+            System.err.println("Error deleting xe by ID: " + e.getMessage());
+            e.printStackTrace();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+                System.out.println("Transaction rolled back");
+            }
+            throw new RuntimeException("Failed to delete xe: " + e.getMessage(), e);
+        } finally {
+            em.close();
+            System.out.println("EntityManager closed");
+        }
     }
 
     public List<Xe> findByBienSo(String bienSo) {
@@ -43,12 +84,6 @@ public class XeService {
 
     public List<Xe> findByMaHieuXe(Integer maHieuXe) {
         return xeDAO.findByMaHieuXe(maHieuXe);
-    }
-
-    public boolean canDelete(Xe xe) {
-        // Check if there are any PhieuSuaChua for this Xe
-        List<PhieuSuaChua> phieuSuaChuas = phieuSuaChuaDAO.findByMaXe(xe.getMaXe());
-        return phieuSuaChuas.isEmpty();
     }
 
     // Convert to DTO

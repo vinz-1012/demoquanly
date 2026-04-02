@@ -37,7 +37,7 @@ public class PhieuSuaChuaSubForm extends JPanel {
     private final JTextField txtNgayTra;
     private final JComboBox<String> cbTrangThai;
     private final JTextField txtGhiChu;
-    private final JTextField txtSearchTrangThai;
+    private final JTextField txtSearch; // Changed from txtSearchTrangThai
 
     public PhieuSuaChuaSubForm() {
         setLayout(new BorderLayout(8, 8));
@@ -61,9 +61,9 @@ public class PhieuSuaChuaSubForm extends JPanel {
         panelInput.add(new JLabel("Ghi chu:"));
         txtGhiChu = new JTextField();
         panelInput.add(txtGhiChu);
-        panelInput.add(new JLabel("Tim theo trang thai:"));
-        txtSearchTrangThai = new JTextField();
-        panelInput.add(txtSearchTrangThai);
+        panelInput.add(new JLabel("Tim theo ten KH/ma phieu:"));
+        txtSearch = new JTextField();
+        panelInput.add(txtSearch);
 
         JPanel panelButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnAdd = new JButton("Them");
@@ -172,9 +172,26 @@ public class PhieuSuaChuaSubForm extends JPanel {
     }
 
     private void searchPhieuSuaChua() {
-        String trangThai = txtSearchTrangThai.getText().trim();
+        String keyword = txtSearch.getText().trim();
         tableModel.setRowCount(0);
-        List<PhieuSuaChuaDTO> list = controller.getPhieuSuaChuaByTrangThai(trangThai);
+        
+        if (keyword.isEmpty()) {
+            // If search is empty, load all data
+            loadData();
+            return;
+        }
+        
+        List<PhieuSuaChuaDTO> list;
+        
+        // Try to parse as integer for ma phieu search
+        try {
+            Integer maPhieu = Integer.parseInt(keyword);
+            list = controller.getPhieuSuaChuaByMaPhieu(maPhieu);
+        } catch (NumberFormatException e) {
+            // If not a number, search by customer name
+            list = controller.getPhieuSuaChuaByTenKH(keyword);
+        }
+        
         for (PhieuSuaChuaDTO dto : list) {
             tableModel.addRow(new Object[] {dto.getMaPhieu(), dto.getBienSo(), dto.getTenKH(), dto.getTenNV(), dto.getNgayNhan(), dto.getNgayTra(), dto.getTrangThai(), dto.getGhiChu()});
         }

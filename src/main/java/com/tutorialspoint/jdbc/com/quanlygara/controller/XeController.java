@@ -50,10 +50,13 @@ public class XeController {
         Xe xe = xeService.findById(maXe);
         if (xe != null) {
             if (xeService.canDelete(xe)) {
-                xeService.delete(xe);
+                // Use the new direct delete method
+                xeService.deleteById(maXe);
             } else {
                 throw new RuntimeException("Không thể xóa xe vì có phiếu sửa chữa liên quan.");
             }
+        } else {
+            throw new RuntimeException("Không tìm thấy xe có mã: " + maXe);
         }
     }
 
