@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "PhieuSuaChua")
 public class PhieuSuaChua {
+    // Entity phi?u s?a ch?a - qu?n lý các phi?u s?a xe c?a khách
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaPhieu")

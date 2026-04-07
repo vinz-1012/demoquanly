@@ -23,6 +23,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 public class MainForm extends JFrame {
+    // Form chính - ch?a các tab qu?n lý gara
     private KhachHangSubForm khachHangTab;
     private XeSubForm xeTab;
     private NhanVienSubForm nhanVienTab;

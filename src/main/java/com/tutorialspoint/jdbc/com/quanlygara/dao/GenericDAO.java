@@ -7,6 +7,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class GenericDAO<T> {
+    // DAO generik - cung c?p CRUD operations cho t?t c? entities
     private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("quanlygaraPU");
     private Class<T> entityClass;
 

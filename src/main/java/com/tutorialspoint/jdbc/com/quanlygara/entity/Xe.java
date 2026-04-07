@@ -17,10 +17,11 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Xe")
 public class Xe {
+    // Entity xe - luu thông tin xe c?a khách hàng
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaXe")
-    private Integer maXe;
+    private Integer maXe; // Mã xe (PK)
 
     @Column(name = "BienSo", length = 20)
     private String bienSo;
